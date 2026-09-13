@@ -14,16 +14,6 @@ A blockchain-based forensic evidence management system for law enforcement that 
 - **Dashboard**: Statistics and recent activity overview
 - **Search**: Find evidence by filename, case ID, or date range
 
-## 💰 Cost: $0.00 (Completely Free!)
-
-This project uses:
-- **Polygon Mumbai Testnet** (real blockchain) - FREE
-- **MongoDB Community Edition** - FREE
-- **Node.js** - FREE
-- **Test MATIC tokens** - FREE (from faucet)
-- **Reading from blockchain** - FREE forever!
-
-No credit card required. No subscriptions. No hidden costs.
 
 ### ❓ Common Questions
 
