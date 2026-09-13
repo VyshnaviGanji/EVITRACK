@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Evitrack — System Architecture</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f8;
+    padding: 40px;
+    color: #1e293b;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* ── LAYERS ── */
+  .layer {
+    width: 100%;
+    border-radius: 14px;
+    padding: 20px 24px;
+    position: relative;
+  }
+
+  .layer-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    opacity: 0.6;
+  }
+
+  /* Client Layer */
+  .layer-client { background: #1e3a5f; color: white; }
+  .layer-client .layer-label { color: #93c5fd; }
+
+  /* Server Layer */
+  .layer-server { background: #0f2744; color: white; margin-top: 0; }
+  .layer-server .layer-label { color: #6ee7b7; }
+
+  /* Storage Layer */
+  .layer-storage {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  /* ── ARROW ── */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    z-index: 10;
+  }
+  .arrow-line {
+    width: 2px;
+    height: 28px;
+    background: #94a3b8;
+  }
+  .arrow-head {
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 10px solid #94a3b8;
+  }
+  .arrow-label {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── BOXES ── */
+  .boxes {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .box {
+    border-radius: 10px;
+    padding: 14px 18px;
+    min-width: 140px;
+    text-align: center;
+  }
+
+  .box-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .box-sub {
+    font-size: 11px;
+    opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  /* Client boxes */
+  .box-screen {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  /* Middleware */
+  .box-mid {
+    background: rgba(110,231,183,0.15);
+    border: 1.5px solid rgba(110,231,183,0.3);
+    color: #6ee7b7;
+  }
+
+  /* Routes */
+  .box-route {
+    background: rgba(147,197,253,0.12);
+    border: 1.5px solid rgba(147,197,253,0.25);
+    color: #93c5fd;
+  }
+
+  /* Blockchain util */
+  .box-util {
+    background: rgba(251,191,36,0.12);
+    border: 1.5px solid rgba(251,191,36,0.3);
+    color: #fbbf24;
+  }
+
+  /* Storage boxes */
+  .storage-box {
+    flex: 1;
+    border-radius: 14px;
+    padding: 20px 24px;
+    min-width: 200px;
+  }
+
+  .storage-mongo {
+    background: #14532d;
+    color: white;
+    border: 2px solid #16a34a;
+  }
+
+  .storage-blockchain {
+    background: #1e1b4b;
+    color: white;
+    border: 2px solid #6366f1;
+  }
+
+  .storage-disk {
+    background: #1c1917;
+    color: white;
+    border: 2px solid #78716c;
+  }
+
+  .storage-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .storage-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-mongo { background: #16a34a; }
+  .dot-blockchain { background: #6366f1; }
+  .dot-disk { background: #78716c; }
+
+  .storage-item {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.8);
+  }
+
+  .storage-item.highlight {
+    background: rgba(99,102,241,0.25);
+    color: #a5b4fc;
+    font-weight: 600;
+  }
+
+  .storage-item.highlight-green {
+    background: rgba(22,163,74,0.2);
+    color: #86efac;
+    font-weight: 600;
+  }
+
+  /* ── FLOW SECTION ── */
+  .flow-section {
+    width: 100%;
+    max-width: 960px;
+    margin: 40px auto 0;
+  }
+
+  .flow-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .flows {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .flow-card {
+    flex: 1;
+    min-width: 260px;
+    background: white;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-top: 4px solid;
+  }
+
+  .flow-card.upload { border-color: #2563eb; }
+  .flow-card.verify { border-color: #16a34a; }
+  .flow-card.access { border-color: #7c3aed; }
+
+  .flow-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #0f172a;
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: white;
+  }
+
+  .flow-card.upload .step-num { background: #2563eb; }
+  .flow-card.verify .step-num { background: #16a34a; }
+  .flow-card.access .step-num { background: #7c3aed; }
+
+  .step-text {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.5;
+    padding-top: 3px;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #475569;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  /* connector between layers */
+  .layer-connector {
+    width: 2px;
+    height: 20px;
+    background: #475569;
+    margin: 0 auto;
+  }
+
+  .double-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 4px 0;
+  }
+
+  .double-arrow-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .da-line {
+    width: 2px;
+    height: 20px;
+    background: #64748b;
+  }
+
+  .da-label {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 600;
+    background: #f0f4f8;
+    padding: 2px 10px;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+  }
+
+  .storage-arrow-row {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .storage-arrow-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>EVITRACK</h1>
+<p class="subtitle">System Architecture Diagram — Blockchain-Based Digital Evidence Management</p>
+
+<div class="diagram">
+
+  <!-- CLIENT LAYER -->
+  <div class="layer layer-client">
+    <div class="layer-label">Presentation Layer — Browser Client</div>
+    <div class="boxes">
+      <div class="box box-screen">
+        <div class="box-title">Login / Register</div>
+        <div class="box-sub">JWT Auth<br>Officer Registration</div>
+      </div>
+      <div class="box box-screen">
+        <div class="box-title">Dashboard</div>
+        <div class="box-sub">Per-officer stats<br>Recent activity</div>
+      </div>
+      <div class="box box-screen">
+        <div class="box-title">Cases</div>
+        <div class="box-sub">Create case<br>Assign officers<br>Add evidence</div>
+      </div>
+      <div class="box box-screen">
+        <div class="box-title">View Evidence</div>
+        <div class="box-sub">Search / filter<br>Preview / download<br>Custody chain</div>
+      </div>
+      <div class="box box-screen">
+        <div class="box-title">Verify Evidence</div>
+        <div class="box-sub">Blockchain hash<br>comparison result</div>
+      </div>
+      <div class="box box-screen">
+        <div class="box-title">Admin Panel</div>
+        <div class="box-sub">Officers / Cases<br>Activity log<br>System stats</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARROW -->
+  <div class="double-arrow">
+    <div class="double-arrow-inner">
+      <div class="da-line"></div>
+      <div class="da-label">HTTP REST API (JWT Protected)</div>
+      <div class="da-line"></div>
+    </div>
+  </div>
+
+  <!-- SERVER LAYER -->
+  <div class="layer layer-server">
+    <div class="layer-label">Application Layer — Node.js / Express Server</div>
+
+    <!-- Middleware row -->
+    <div class="boxes" style="margin-bottom:14px;">
+      <div class="box box-mid" style="min-width:200px;">
+        <div class="box-title">authMiddleware</div>
+        <div class="box-sub">Validates JWT token<br>Attaches req.officer</div>
+      </div>
+      <div class="box box-mid" style="min-width:200px;">
+        <div class="box-title">adminMiddleware</div>
+        <div class="box-sub">Checks isAdmin flag<br>Blocks non-admins</div>
+      </div>
+      <div class="box box-mid" style="min-width:200px;">
+        <div class="box-title">multer</div>
+        <div class="box-sub">File upload handler<br>100MB limit</div>
+      </div>
+    </div>
+
+    <!-- Routes row -->
+    <div class="boxes" style="margin-bottom:14px;">
+      <div class="box box-route">
+        <div class="box-title">auth.js</div>
+        <div class="box-sub">/register<br>/login</div>
+      </div>
+      <div class="box box-route">
+        <div class="box-title">evidence.js</div>
+        <div class="box-sub">/upload<br>/list<br>/verify/:id<br>/download/:id<br>/custody/:id<br>/stats/dashboard</div>
+      </div>
+      <div class="box box-route">
+        <div class="box-title">cases.js</div>
+        <div class="box-sub">/create<br>/list<br>/:caseId<br>/:caseId/assign<br>/:caseId/status</div>
+      </div>
+      <div class="box box-route">
+        <div class="box-title">admin.js</div>
+        <div class="box-sub">/stats<br>/officers<br>/cases<br>/activity</div>
+      </div>
+      <div class="box box-route">
+        <div class="box-title">activity.js</div>
+        <div class="box-sub">/log</div>
+      </div>
+    </div>
+
+    <!-- Blockchain util -->
+    <div class="boxes">
+      <div class="box box-util" style="min-width:320px;">
+        <div class="box-title">blockchain.js (ethers.js)</div>
+        <div class="box-sub">storeHashOnBlockchain(hash, caseId, evidenceId) &nbsp;|&nbsp; getHashFromBlockchain(evidenceId)</div>
+      </div>
+      <div class="box box-util" style="min-width:220px;">
+        <div class="box-title">crypto (Node.js built-in)</div>
+        <div class="box-sub">SHA-256 hash generation<br>from file read stream</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORAGE ARROWS -->
+  <div class="storage-arrow-row" style="margin-top:4px;">
+    <div class="storage-arrow-col">
+      <div class="double-arrow-inner">
+        <div class="da-line"></div>
+        <div class="da-label">Mongoose ODM</div>
+        <div class="da-line"></div>
+      </div>
+    </div>
+    <div class="storage-arrow-col">
+      <div class="double-arrow-inner">
+        <div class="da-line"></div>
+        <div class="da-label">ethers.js / JSON-RPC</div>
+        <div class="da-line"></div>
+      </div>
+    </div>
+    <div class="storage-arrow-col">
+      <div class="double-arrow-inner">
+        <div class="da-line"></div>
+        <div class="da-label">fs (Node.js)</div>
+        <div class="da-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORAGE LAYER -->
+  <div class="layer-storage">
+
+    <div class="storage-box storage-mongo">
+      <div class="storage-title">
+        <div class="storage-dot dot-mongo"></div>
+        MongoDB
+      </div>
+      <div class="storage-item highlight-green">Officers</div>
+      <div class="storage-item highlight-green">Cases + assignedOfficers[]</div>
+      <div class="storage-item highlight-green">Evidence metadata</div>
+      <div class="storage-item highlight-green">ActivityLog</div>
+      <div class="storage-item highlight-green">Registry (valid PIDs)</div>
+      <div class="storage-item" style="margin-top:8px; font-size:11px; color:#86efac; opacity:0.7;">
+        Hash NOT stored here
+      </div>
+    </div>
+
+    <div class="storage-box storage-blockchain">
+      <div class="storage-title">
+        <div class="storage-dot dot-blockchain"></div>
+        Ganache (Local Blockchain)
+      </div>
+      <div class="storage-item">EvidenceStorage.sol</div>
+      <div class="storage-item highlight">mapping: evidenceId → hash</div>
+      <div class="storage-item highlight">storeHash(id, hash)</div>
+      <div class="storage-item highlight">getHash(id)</div>
+      <div class="storage-item" style="margin-top:8px; font-size:11px; color:#a5b4fc; opacity:0.7;">
+        Immutable — cannot be altered
+      </div>
+    </div>
+
+    <div class="storage-box storage-disk">
+      <div class="storage-title">
+        <div class="storage-dot dot-disk"></div>
+        Local Disk
+      </div>
+      <div class="storage-item">uploads/evidence/</div>
+      <div class="storage-item">Original evidence files</div>
+      <div class="storage-item">JPEG, MP4, PDF, MP3...</div>
+      <div class="storage-item" style="margin-top:8px; font-size:11px; color:#d6d3d1; opacity:0.7;">
+        Max 100MB per file
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- KEY FLOWS -->
+<div class="flow-section">
+  <div class="flow-title">Key Process Flows</div>
+  <div class="flows">
+
+    <div class="flow-card upload">
+      <div class="flow-card-title">Upload Flow</div>
+      <div class="flow-step"><div class="step-num">1</div><div class="step-text">Officer selects file and fills evidence form inside a case</div></div>
+      <div class="flow-step"><div class="step-num">2</div><div class="step-text">Server checks officer is assigned to the case</div></div>
+      <div class="flow-step"><div class="step-num">3</div><div class="step-text">File saved to disk via multer</div></div>
+      <div class="flow-step"><div class="step-num">4</div><div class="step-text">SHA-256 hash generated from file stream</div></div>
+      <div class="flow-step"><div class="step-num">5</div><div class="step-text">Hash stored on blockchain via storeHash()</div></div>
+      <div class="flow-step"><div class="step-num">6</div><div class="step-text">Evidence metadata saved to MongoDB (hash NOT included)</div></div>
+      <div class="flow-step"><div class="step-num">7</div><div class="step-text">Custody chain entry + ActivityLog created</div></div>
+    </div>
+
+    <div class="flow-card verify">
+      <div class="flow-card-title">Verification Flow</div>
+      <div class="flow-step"><div class="step-num">1</div><div class="step-text">Officer clicks Verify on any evidence item</div></div>
+      <div class="flow-step"><div class="step-num">2</div><div class="step-text">Server re-generates SHA-256 hash of current file on disk</div></div>
+      <div class="flow-step"><div class="step-num">3</div><div class="step-text">Original hash fetched from blockchain via getHash()</div></div>
+      <div class="flow-step"><div class="step-num">4</div><div class="step-text">Hashes compared — match = Verified, mismatch = Tampered</div></div>
+      <div class="flow-step"><div class="step-num">5</div><div class="step-text">verificationStatus updated in MongoDB</div></div>
+      <div class="flow-step"><div class="step-num">6</div><div class="step-text">Result card shown with blockchain metadata</div></div>
+    </div>
+
+    <div class="flow-card access">
+      <div class="flow-card-title">Access Control Flow</div>
+      <div class="flow-step"><div class="step-num">1</div><div class="step-text">Officer logs in → JWT issued with officer ID</div></div>
+      <div class="flow-step"><div class="step-num">2</div><div class="step-text">Every request passes through authMiddleware</div></div>
+      <div class="flow-step"><div class="step-num">3</div><div class="step-text">Evidence/case queries filter by assignedOfficers array</div></div>
+      <div class="flow-step"><div class="step-num">4</div><div class="step-text">Officer sees only their assigned cases and evidence</div></div>
+      <div class="flow-step"><div class="step-num">5</div><div class="step-text">Admin token has isAdmin: true → bypasses all filters</div></div>
+      <div class="flow-step"><div class="step-num">6</div><div class="step-text">Admin sees all officers, cases, evidence, activity</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#1e3a5f;"></div> Browser Client</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0f2744;"></div> Express Server</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#14532d;"></div> MongoDB</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1e1b4b;"></div> Blockchain (Ganache)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1c1917;"></div> Local Disk Storage</div>
+</div>
+
+<p style="text-align:center; margin-top:32px; font-size:12px; color:#94a3b8;">
+  Evitrack — Blockchain-Based Forensic Evidence Management System
+</p>
+
+</body>
+</html>

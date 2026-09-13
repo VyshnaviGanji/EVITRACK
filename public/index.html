@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evitrack - Evidence Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen active">
+        <div class="container">
+            <div class="logo">
+                <div class="badge">🛡️</div>
+                <h1>EVITRACK</h1>
+                <p>Digital Evidence Integrity System</p>
+            </div>
+            
+            <div class="card">
+                <h2>Officer Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="officer@police.gov" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <p class="link-text">New Officer? <a href="#" onclick="showRegister()">Register</a></p>
+                <p class="link-text" style="margin-top:8px; font-size:12px; color: var(--gray-400);">Admin? Use your admin credentials to login.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div id="registerScreen" class="screen">
+        <div class="container">
+            <div class="logo">
+                <div class="badge">🛡️</div>
+                <h1>EVITRACK</h1>
+                <p>Officer Registration</p>
+            </div>
+            
+            <div class="card">
+                <h2>Register New Officer</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" placeholder="officer@police.gov" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" placeholder="Min 8 chars, uppercase, lowercase, numbers" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Police ID</label>
+                        <input type="text" id="regPoliceId" placeholder="PID001" required>
+                        <small>Use: PID001, PID002, PID003, PID004, or PID005</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" id="regDepartment" placeholder="Forensics" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Station (Optional)</label>
+                        <input type="text" id="regStation" placeholder="Central Station">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+                <p class="link-text">Already registered? <a href="#" onclick="showLogin()">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboardScreen" class="screen">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="badge-small">🛡️</span>
+                <span>EVITRACK</span>
+            </div>
+            <div class="nav-user">
+                <span id="userName">Officer</span>
+                <button onclick="logout()" class="btn btn-small">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('dashboard')">Dashboard</button>
+                <button class="tab" onclick="showTab('cases')">Cases</button>
+                <button class="tab" onclick="showTab('evidence')">View Evidence</button>
+                <button class="tab" onclick="showTab('verify')">Verify Evidence</button>
+                <button class="tab admin-only hidden" onclick="showTab('activity')">Activity Log</button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="tab-content active">
+                <h2 id="dashboardGreeting">Dashboard</h2>
+                <div class="stats-grid" style="grid-template-columns: repeat(4,1fr);">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalEvidence">0</div>
+                        <div class="stat-label">My Evidence</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCases">0</div>
+                        <div class="stat-label">My Cases</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="verifiedEvidence">0</div>
+                        <div class="stat-label">Verified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="tamperedEvidence">0</div>
+                        <div class="stat-label">Tampered</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Evidence Activity</h3>
+                    <div id="recentActivity">
+                        <p class="text-muted">No recent activity</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cases Tab -->
+            <div id="casesTab" class="tab-content">
+                <h2>Case Management</h2>
+                <div class="card" style="margin-bottom:20px;">
+                    <h3>Create New Case</h3>
+                    <form id="caseForm">
+                        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+                            <div class="form-group" style="margin:0; flex:0 0 140px;">
+                                <label>Case ID</label>
+                                <input type="text" id="newCaseId" placeholder="CASE001" required>
+                            </div>
+                            <div class="form-group" style="margin:0; flex:1; min-width:180px;">
+                                <label>Case Title</label>
+                                <input type="text" id="newCaseTitle" placeholder="Robbery at Main St." required>
+                            </div>
+                            <div class="form-group" style="margin:0; flex:2; min-width:200px;">
+                                <label>Description (optional)</label>
+                                <input type="text" id="newCaseDesc" placeholder="Brief description">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:12px;">
+                            <label>Assign Officers (Police IDs, comma separated)</label>
+                            <input type="text" id="newCaseOfficers" placeholder="PID002, PID003 — leave blank for just yourself">
+                            <small>You are always assigned. Add others by their Police ID.</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:auto; margin-top:4px; padding:12px 24px;">Create Case</button>
+                    </form>
+                </div>
+
+                <div id="casesList"></div>
+            </div>
+
+            <!-- Evidence List Tab -->
+            <div id="evidenceTab" class="tab-content">
+                <h2>Evidence List</h2>
+
+                <!-- Search & Filter Bar -->
+                <div class="filter-bar">
+                    <div class="search-input-wrap">
+                        <svg class="search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="searchInput" placeholder="Search by case ID or evidence name..." oninput="filterEvidence()">
+                    </div>
+                    <select id="filterCase" onchange="filterEvidence()">
+                        <option value="">All Cases</option>
+                    </select>
+                    <select id="filterType" onchange="filterEvidence()">
+                        <option value="">All Types</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
+                        <option value="document">Document</option>
+                        <option value="audio">Audio</option>
+                    </select>
+                    <select id="filterStatus" onchange="filterEvidence()">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="verified">Verified</option>
+                        <option value="tampered">Tampered</option>
+                    </select>
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                </div>
+
+                <div class="card" style="overflow-x: auto; padding: 0;">
+                    <table id="evidenceTable" style="min-width: 750px;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 16px;">Case ID</th>
+                                <th style="padding: 16px;">Evidence Name</th>
+                                <th style="padding: 16px;">Type</th>
+                                <th style="padding: 16px;">Upload Date</th>
+                                <th style="padding: 16px;">Status</th>
+                                <th style="padding: 16px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evidenceTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted" style="padding: 32px;">No evidence uploaded yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Activity Log Tab -->
+            <div id="activityTab" class="tab-content">
+                <h2>Activity Log</h2>
+                <div class="card" style="padding: 0; overflow-x: auto;">
+                    <table id="activityTable" style="min-width: 700px;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 16px;">Time</th>
+                                <th style="padding: 16px;">Officer</th>
+                                <th style="padding: 16px;">Action</th>
+                                <th style="padding: 16px;">Evidence</th>
+                                <th style="padding: 16px;">Case ID</th>
+                                <th style="padding: 16px;">Result</th>
+                                <th style="padding: 16px;">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityTableBody">
+                            <tr><td colspan="7" class="text-center text-muted" style="padding:32px;">No activity yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Verify Tab -->
+            <div id="verifyTab" class="tab-content">
+                <h2>Verify Evidence</h2>
+                <div id="verifyPlaceholder" class="verify-placeholder">
+                    <div class="verify-placeholder-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <p class="verify-placeholder-title">No verification run yet</p>
+                    <p class="verify-placeholder-sub">Go to <strong>View Evidence</strong> and click <strong>Verify</strong> on any evidence item.</p>
+                </div>
+                <div id="verifyResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Screen -->
+    <div id="adminScreen" class="screen">
+        <nav class="navbar admin-navbar">
+            <div class="nav-brand">
+                <span class="badge-small">🛡️</span>
+                <span>EVITRACK</span>
+                <span class="admin-badge">ADMIN</span>
+            </div>
+            <div class="nav-user">
+                <span id="adminUserName">Admin</span>
+                <button onclick="logout()" class="btn btn-small">Logout</button>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="tabs">
+                <button class="tab active" onclick="showAdminTab('adminOverview', this)">Overview</button>
+                <button class="tab" onclick="showAdminTab('adminOfficers', this)">Officers</button>
+                <button class="tab" onclick="showAdminTab('adminCases', this)">All Cases</button>
+                <button class="tab" onclick="showAdminTab('adminActivity', this)">Activity Log</button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="adminOverviewTab" class="tab-content active">
+                <h2>System Overview</h2>
+                <div class="stats-grid" style="grid-template-columns: repeat(5,1fr);">
+                    <div class="stat-card">
+                        <div class="stat-number" id="adminTotalOfficers">0</div>
+                        <div class="stat-label">Officers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="adminTotalEvidence">0</div>
+                        <div class="stat-label">Total Evidence</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="adminVerified">0</div>
+                        <div class="stat-label">Verified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="adminTampered">0</div>
+                        <div class="stat-label">Tampered</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="adminTotalActions">0</div>
+                        <div class="stat-label">Total Actions</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officers Tab -->
+            <div id="adminOfficersTab" class="tab-content">
+                <h2>Registered Officers</h2>
+                <div class="card" style="padding:0; overflow-x:auto;">
+                    <table style="min-width:700px; width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="padding:16px;">Name</th>
+                                <th style="padding:16px;">Email</th>
+                                <th style="padding:16px;">Police ID</th>
+                                <th style="padding:16px;">Department</th>
+                                <th style="padding:16px;">Station</th>
+                                <th style="padding:16px;">Registered</th>
+                                <th style="padding:16px;">Last Login</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminOfficersBody">
+                            <tr><td colspan="7" class="text-center text-muted" style="padding:32px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Cases Tab -->
+            <div id="adminCasesTab" class="tab-content">
+                <h2>All Cases</h2>
+                <div class="card" style="padding:0; overflow-x:auto;">
+                    <table style="min-width:700px; width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="padding:16px;">Case ID</th>
+                                <th style="padding:16px;">Title</th>
+                                <th style="padding:16px;">Status</th>
+                                <th style="padding:16px;">Created By</th>
+                                <th style="padding:16px;">Assigned Officers</th>
+                                <th style="padding:16px;">Evidence</th>
+                                <th style="padding:16px;">Created</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminCasesBody">
+                            <tr><td colspan="7" class="text-center text-muted" style="padding:32px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Activity Log Tab -->
+            <div id="adminActivityTab" class="tab-content">
+                <h2>Activity Log</h2>
+                <div class="card" style="padding:0; overflow-x:auto;">
+                    <table style="min-width:800px; width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th style="padding:16px;">Time</th>
+                                <th style="padding:16px;">Officer</th>
+                                <th style="padding:16px;">Action</th>
+                                <th style="padding:16px;">Evidence</th>
+                                <th style="padding:16px;">Case ID</th>
+                                <th style="padding:16px;">Result</th>
+                                <th style="padding:16px;">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminActivityBody">
+                            <tr><td colspan="7" class="text-center text-muted" style="padding:32px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Case Detail Modal -->
+    <div id="caseModal" class="modal-overlay hidden" onclick="if(event.target.id==='caseModal')closeCaseModal()">
+        <div class="modal-box" style="max-width:860px;">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" id="caseModalTitle">Case Details</div>
+                    <div class="modal-meta" id="caseModalMeta"></div>
+                </div>
+                <button class="modal-close" onclick="closeCaseModal()">✕</button>
+            </div>
+            <div class="modal-body" style="background:var(--white); align-items:flex-start; padding:0; overflow-y:auto; max-height:70vh; flex-direction:column; width:100%;" id="caseModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="toggleUploadForm()">+ Add Evidence</button>
+                <button class="btn btn-secondary" onclick="closeCaseModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Evidence Modal (inside case) -->
+    <div id="uploadModal" class="modal-overlay hidden" onclick="if(event.target.id==='uploadModal')closeUploadModal()">
+        <div class="modal-box" style="max-width:560px;">
+            <div class="modal-header">
+                <div class="modal-title" id="uploadModalTitle">Add Evidence</div>
+                <button class="modal-close" onclick="closeUploadModal()">✕</button>
+            </div>
+            <div class="modal-body" style="background:var(--white); align-items:flex-start; padding:24px; width:100%;">
+                <form id="uploadForm" style="width:100%;">
+                    <input type="hidden" id="caseId">
+                    <div class="form-group">
+                        <label>Evidence Name</label>
+                        <input type="text" id="evidenceName" placeholder="Crime Scene Photo" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Evidence Type</label>
+                        <select id="evidenceType" required>
+                            <option value="">Select type...</option>
+                            <option value="image">Image</option>
+                            <option value="video">Video</option>
+                            <option value="document">Document</option>
+                            <option value="audio">Audio</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="description" placeholder="Brief description" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload File</label>
+                        <input type="file" id="evidenceFile" required>
+                        <small>Max size: 100MB</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload to Blockchain</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custody Modal -->
+    <div id="custodyModal" class="modal-overlay hidden" onclick="if(event.target.id==='custodyModal')closeCustodyModal()">
+        <div class="modal-box" style="max-width:560px;">
+            <div class="modal-header">
+                <div class="modal-title" id="custodyTitle">Chain of Custody</div>
+                <button class="modal-close" onclick="closeCustodyModal()">✕</button>
+            </div>
+            <div class="modal-body" style="background:var(--white); align-items:flex-start; padding:24px;" id="custodyBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCustodyModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal-overlay hidden" onclick="closePreview(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" id="previewTitle">Evidence Preview</div>
+                    <div class="modal-meta" id="previewMeta"></div>
+                </div>
+                <button class="modal-close" onclick="closePreviewModal()">✕</button>
+            </div>
+            <div class="modal-body" id="previewBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePreviewModal()">Close</button>
+                <button class="btn btn-success" id="previewDownloadBtn">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p class="loading-text">Processing...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
