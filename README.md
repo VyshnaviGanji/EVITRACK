@@ -15,46 +15,7 @@ A blockchain-based forensic evidence management system for law enforcement that 
 - **Search**: Find evidence by filename, case ID, or date range
 
 
-### ❓ Common Questions
 
-**Q: Is MetaMask a blockchain?**  
-A: No! MetaMask is just a wallet app. The blockchain is Polygon Mumbai (a public network).
-
-**Q: Can we fetch from real blockchain?**  
-A: Yes! Reading from blockchain is completely FREE. Only writing costs gas (which is FREE on testnet).
-
-**Q: Where is the hash stored?**  
-A: ONLY on the blockchain. NOT in the database. This ensures true immutability.
-
-📖 Read [YOUR_QUESTIONS_ANSWERED.md](YOUR_QUESTIONS_ANSWERED.md) for detailed explanations!
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js v16+ ([Download](https://nodejs.org/))
-- MongoDB ([Download](https://www.mongodb.com/try/download/community))
-
-### Installation
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Start MongoDB (in a separate terminal)
-mongod
-
-# 3. Copy environment file
-cp .env.example .env
-
-# 4. Seed test police officers
-npm run seed
-
-# 5. Start the server (works in simulation mode)
-npm run dev
-```
-
-Server runs at: http://localhost:5000
 
 ### Optional: Deploy to Real Blockchain
 
